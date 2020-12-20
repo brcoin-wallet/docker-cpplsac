@@ -3,9 +3,14 @@ Image packaging for Cpp-Baerchain
 
 # How to build
 # build the builder
+```
 docker build -t brcd:builder -f Dockerfile.builder
+```
+
 # build the client
+```
 docker build -t brcd:v1.3.0 -f Dockerfile --build-arg gitversion=v1.3.0
+```
 
 # How to use
 ```
