@@ -1,0 +1,18 @@
+FROM brcd:builder as build
+
+WORKDIR /root
+RUN git clone --recursive https://github.com/BaerChain/cpp-lsac.git
+RUN cd cpp-lsac && git pull && git checkout v1.3.0 && mkdir build && cd build && cmake .. && make -j2 brcd
+
+FROM ubuntu:18.04
+
+RUN apt-get update && apt-get install -y libboost-thread1.65.1 libboost-filesystem1.65.1 libboost-program-options1.65.1 libboost-log1.65.1 libmicrohttpd12 libjsoncpp1 libsnappy1v5 libscrypt0 libssl1.1 libleveldb1v5 libcurl4 libhiredis0.13 libgflags2.2
+RUN rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /root/cpp-lsac/build/brcd/brcd /root/brcd
+COPY --from=build /usr/local/lib/libjsonrpccpp-client.so.1 /usr/local/lib/libjsonrpccpp-client.so.1
+COPY --from=build /usr/local/lib/librocksdb.so.6 /usr/local/lib/librocksdb.so.6
+COPY --from=build /usr/local/lib/libjsonrpccpp-server.so.1 /usr/local/lib/libjsonrpccpp-server.so.1
+COPY --from=build /usr/local/lib/libjsonrpccpp-common.so.1 /usr/local/lib/libjsonrpccpp-common.so.1
+
+# docker build -t brcd:thin -f Dockerfile.runner .
